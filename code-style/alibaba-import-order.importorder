@@ -1,0 +1,17 @@
+# 阿里巴巴Java编码规范 - Import顺序配置
+# 适用于 Spotless importOrder
+
+# 分组顺序（组间用空行分隔）：
+# 1. java
+# 2. javax
+# 3. jakarta
+# 4. org
+# 5. com
+# 6. 其他第三方
+# 7. 项目内部
+
+java
+javax
+jakarta
+org
+com
