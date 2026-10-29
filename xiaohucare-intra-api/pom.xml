@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.xiaohucare.boot</groupId>
+        <artifactId>xiaohucare-base</artifactId>
+        <version>3.17.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>xiaohucare-intra-api</artifactId>
+     <version>3.17.0</version>
+    <description>
+        iot业务模块
+    </description>
+    <dependencies>
+        <!-- 统计服务模块 -->
+        <dependency>
+            <groupId>com.xiaohucare.boot</groupId>
+            <artifactId>xiaohucare-service</artifactId>
+            <version>3.17.0</version>
+        </dependency>
+        <dependency>
+        	  <groupId>com.xiaohucare.boot</groupId>
+        	  <artifactId>xiaohucare-framework-oss</artifactId>
+        </dependency>
+        <!-- 
+         <dependency>
+            <groupId>com.xiaohucare.boot</groupId>
+            <artifactId>xiaohucare-ai-service</artifactId>
+            <version>3.17.0</version>
+        </dependency>
+        -->
+        <!-- XXL-JOB -->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+        
+        <!-- SpringDoc OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+         <groupId>com.xiaohucare.boot</groupId>
+         <artifactId>xiaohucare-framework-plugs</artifactId>
+        <version>3.17.0</version>
+    </parent>
+    <artifactId>xiaohucare-framework-oss</artifactId>
+    <version>3.17.0</version>
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+       <dependency>
+            <groupId>com.xiaohucare.boot</groupId>
+            <artifactId>xiaohucare-common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- 阿里云OSS SDK -->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.15.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- STS SDK（签发临时凭证）- 使用新版 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>sts20150401</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+        <!-- 华为云OSS SDK -->
+       <dependency>
+		    <groupId>com.huaweicloud</groupId>
+		    <artifactId>esdk-obs-java</artifactId>
+		    <version>3.25.7</version>
+		</dependency>
+        <!-- HTTP客户端（用于RustFS）- 版本统一由根 pom 管理，避免与 InfluxDB 客户端传递的 okhttp 版本冲突 -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

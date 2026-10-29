@@ -1,0 +1,72 @@
+# OSS存储配置
+# 当前使用的存储类型: local, aliyun, huawei, rustfs
+# 默认 local，便于开箱本地运行；使用云存储时通过环境变量注入密钥
+oss:
+  type: ${OSS_TYPE:local}
+  # 本地存储配置
+  local:
+    enabled: ${OSS_LOCAL_ENABLED:true}
+    # 本地存储路径（默认与上传路径保持一致）
+    path: ${OSS_LOCAL_PATH:./uploadPath/oss/local}
+    # 访问域名（可选）
+    domain: ${OSS_LOCAL_DOMAIN:}
+    # 是否使用https
+    https: ${OSS_LOCAL_HTTPS:false}
+    # 存储路径前缀
+    prefix: upload
+  # 阿里云OSS配置（accessKeyId / accessKeySecret 严禁提交真实值，由环境变量注入）
+  aliyun:
+    enabled: ${OSS_ALIYUN_ENABLED:false}
+    # 地域节点
+    endpoint: ${ALIYUN_OSS_ENDPOINT:oss-cn-beijing.aliyuncs.com}
+    # AccessKey ID
+    accessKeyId: ${ALIYUN_OSS_ACCESS_KEY_ID:}
+    # AccessKey Secret
+    accessKeySecret: ${ALIYUN_OSS_ACCESS_KEY_SECRET:}
+    # Bucket名称
+    bucketName: ${ALIYUN_OSS_BUCKET:}
+    # 访问域名（可选，使用自定义域名时配置）
+    # 注意：如果使用OSS默认域名，请注释掉此项，系统会自动生成带签名的URL
+    domain: ${ALIYUN_OSS_DOMAIN:}
+    # 是否使用https
+    https: true
+    # 存储路径前缀
+    prefix: upload
+  
+  # 华为云OSS配置
+  huawei:
+    enabled: ${OSS_HUAWEI_ENABLED:false}
+    # 地域节点
+    endpoint: ${HUAWEI_OSS_ENDPOINT:obs.cn-east-3.myhuaweicloud.com}
+    # AccessKey ID
+    accessKeyId: ${HUAWEI_OSS_ACCESS_KEY_ID:}
+    # AccessKey Secret
+    accessKeySecret: ${HUAWEI_OSS_ACCESS_KEY_SECRET:}
+    # 桶名称
+    bucketName: ${HUAWEI_OSS_BUCKET:}
+    # 区域
+    region: ${HUAWEI_OSS_REGION:cn-east-3}
+    # 访问域名（可选，使用自定义域名时配置）
+    domain: 
+    # 是否使用https
+    https: true
+    # 存储路径前缀
+    prefix: upload
+  
+  # RustFS配置
+  rustfs:
+    enabled: ${OSS_RUSTFS_ENABLED:false}
+    # API地址
+    apiUrl: ${RUSTFS_API_URL:http://localhost:8080/api}
+    # 应用ID
+    appId: ${RUSTFS_APP_ID:}
+    # 应用密钥
+    appSecret: ${RUSTFS_APP_SECRET:}
+    # 超时时间（毫秒）
+    timeout: 30000
+    # 访问域名（可选）
+    domain: 
+    # 是否使用https
+    https: false
+    # 存储路径前缀
+    prefix: upload

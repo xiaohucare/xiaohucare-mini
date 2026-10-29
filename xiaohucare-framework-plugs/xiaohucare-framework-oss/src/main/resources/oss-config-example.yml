@@ -1,0 +1,73 @@
+# OSS 存储配置【示例模板】
+# 本文件仅作参数说明，不会被 Spring 自动加载；
+# 实际配置请写在各服务自身的 application-oss.yml 中（密钥使用环境变量注入）。
+# 当前使用的存储类型: local, aliyun, huawei, rustfs
+oss:
+  type: local
+  
+  # 本地存储配置
+  local:
+    enabled: true
+    # 本地存储路径
+    path: ./xiaohucare/oss/local
+    # 访问域名（可选）
+    domain: 
+    # 是否使用https
+    https: false
+    # 存储路径前缀
+    prefix: upload
+  # 阿里云OSS配置
+  aliyun:
+    enabled: false
+    # 地域节点
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    # AccessKey ID
+    accessKeyId: your_access_key_id
+    # AccessKey Secret
+    accessKeySecret: your_access_key_secret
+    # Bucket名称
+    bucketName: your_bucket_name
+    # 访问域名（可选，使用自定义域名时配置）
+    domain: 
+    # 是否使用https
+    https: true
+    # 存储路径前缀
+    prefix: upload
+  
+  # 华为云OSS配置
+  huawei:
+    enabled: false
+    # 地域节点
+    endpoint: obs.cn-east-3.myhuaweicloud.com
+    # AccessKey ID
+    accessKeyId: your_access_key_id
+    # AccessKey Secret
+    accessKeySecret: your_access_key_secret
+    # 桶名称
+    bucketName: your_bucket_name
+    # 区域
+    region: cn-east-3
+    # 访问域名（可选，使用自定义域名时配置）
+    domain: 
+    # 是否使用https
+    https: true
+    # 存储路径前缀
+    prefix: upload
+  
+  # RustFS配置
+  rustfs:
+    enabled: false
+    # API地址
+    apiUrl: http://localhost:8080/api
+    # 应用ID
+    appId: your_app_id
+    # 应用密钥
+    appSecret: your_app_secret
+    # 超时时间（毫秒）
+    timeout: 30000
+    # 访问域名（可选）
+    domain: 
+    # 是否使用https
+    https: false
+    # 存储路径前缀
+    prefix: upload

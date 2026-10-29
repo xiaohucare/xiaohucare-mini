@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.xiaohucare.boot</groupId>
+        <artifactId>xiaohucare-base</artifactId>
+        <version>3.17.0</version>
+    </parent>
+    <packaging>pom</packaging>
+    <artifactId>xiaohucare-framework-plugs</artifactId>
+    <description>插件工具类整合</description>
+    <modules>
+        <module>xiaohucare-framework-http</module>
+        <module>xiaohucare-framework-video-dahua</module>
+        <module>xiaohucare-framework-oss</module>
+    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+          <!-- SpringDoc OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+        </dependency>
+       <dependency>
+            <groupId>com.xiaohucare.boot</groupId>
+            <artifactId>xiaohucare-common</artifactId>
+        </dependency>
+    </dependencies>
+
+
+</project>

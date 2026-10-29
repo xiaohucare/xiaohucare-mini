@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    生产环境日志配置
+    特点：
+    1. 控制台仅输出 WARN 和 ERROR
+    2. 关闭 SQL 日志输出
+    3. 增大异步队列，提升高并发性能
+    4. ERROR 日志保留 180 天，便于问题追溯
+    5. 总日志大小限制 50GB
+-->
+<configuration>
+    <!-- 应用名称 -->
+    <property name="APP_NAME" value="xiaohucare-platform" />
+    
+    <!-- 日志存放路径 -->
+	<property name="log.path" value="./logs" />
+    
+    <!-- 日志输出格式 -->
+	<!-- 控制台格式（生产环境简化） -->
+	<property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %msg%n" />
+	<!-- 文件无颜色格式 -->
+	<property name="log.file.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - [%method,%line] - %msg%n" />
+	<!-- 用户日志简化格式 -->
+	<property name="log.user.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %msg%n" />
+
+	<!-- ==================== 控制台输出 ==================== -->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${log.pattern}</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+	
+	<!-- ==================== 系统 INFO 日志（异步） ==================== -->
+	<appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${log.path}/sys-info.log</file>
+        <!-- 循环政策：基于时间和大小创建日志文件 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+			<fileNamePattern>${log.path}/sys-info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<!-- 单个文件最大 100MB -->
+			<maxFileSize>100MB</maxFileSize>
+			<!-- 日志最大的历史 60天 -->
+			<maxHistory>60</maxHistory>
+			<!-- 所有日志文件总大小上限 10GB -->
+			<totalSizeCap>10GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${log.file.pattern}</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+	</appender>
+	
+	<!-- 异步 INFO 日志（生产环境优化） -->
+	<appender name="async_info" class="ch.qos.logback.classic.AsyncAppender">
+		<!-- 队列剩余容量小于 100 时，丢弃 DEBUG、INFO 日志 -->
+		<discardingThreshold>100</discardingThreshold>
+		<!-- 增大队列深度，提升高并发性能 -->
+		<queueSize>2048</queueSize>
+		<!-- 不阻塞业务线程 -->
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="file_info"/>
+	</appender>
+	
+	<!-- ==================== 系统 WARN 日志（异步） ==================== -->
+	<appender name="file_warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${log.path}/sys-warn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/sys-warn.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxFileSize>100MB</maxFileSize>
+			<maxHistory>60</maxHistory>
+			<totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.file.pattern}</pattern>
+			<charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+			<onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+	
+	<!-- 异步 WARN 日志（生产环境优化） -->
+	<appender name="async_warn" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>50</discardingThreshold>
+		<queueSize>1024</queueSize>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="file_warn"/>
+	</appender>
+	
+	<!-- ==================== 系统 ERROR 日志（异步） ==================== -->
+	<appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${log.path}/sys-error.log</file>
+        <!-- 循环政策：基于时间和大小创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${log.path}/sys-error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<!-- 单个文件最大 100MB -->
+			<maxFileSize>100MB</maxFileSize>
+			<!-- 日志最大的历史 90天（ERROR日志保留更久） -->
+			<maxHistory>90</maxHistory>
+			<!-- 所有ERROR日志文件总大小上限 5GB -->
+			<totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.file.pattern}</pattern>
+			<charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+	
+	<!-- 异步 ERROR 日志（生产环境优化） -->
+	<appender name="async_error" class="ch.qos.logback.classic.AsyncAppender">
+		<!-- ERROR日志不丢弃任何记录 -->
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>2048</queueSize>
+		<!-- 包括调用方上下文信息 -->
+		<includeCallerData>true</includeCallerData>
+		<!-- 不阻塞业务线程 -->
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="file_error"/>
+	</appender>
+	
+	<!-- ==================== 用户访问日志输出（异步） ==================== -->
+    <appender name="sys-user" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.path}/sys-user.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <fileNamePattern>${log.path}/sys-user.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxFileSize>100MB</maxFileSize>
+            <!-- 日志最大的历史 90天（用户日志保留更久） -->
+            <maxHistory>90</maxHistory>
+			<totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.user.pattern}</pattern>
+			<charset>UTF-8</charset>
+        </encoder>
+    </appender>
+	
+	<!-- 异步用户日志（生产环境优化） -->
+	<appender name="async_user" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>100</discardingThreshold>
+		<queueSize>2048</queueSize>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="sys-user"/>
+	</appender>
+	
+	<!-- SQL 日志输出（异步） -->
+	<!-- 注意：生产环境建议关闭或仅在排查问题时临时开启 -->
+	<appender name="sql_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.path}/sql.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${log.path}/sql.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxFileSize>200MB</maxFileSize>
+			<!-- 生产环境仅保留 7 天 -->
+			<maxHistory>7</maxHistory>
+			<totalSizeCap>5GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %msg%n</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+	
+	<appender name="async_sql" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>200</discardingThreshold>
+		<queueSize>2048</queueSize>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="sql_log"/>
+	</appender>
+	
+	<!-- ==================== 日志级别控制（生产环境） ==================== -->
+	
+	<!-- 项目业务日志 -->
+	<logger name="com.xiaohucare" level="info" additivity="false">
+		<appender-ref ref="console" />
+		<appender-ref ref="async_info" />
+		<appender-ref ref="async_warn" />
+		<appender-ref ref="async_error" />
+	</logger>
+	
+	<!-- MyBatis SQL 日志（生产环境关闭，仅保留 WARN 以上） -->
+	<!-- 如需排查 SQL 问题，临时改为 DEBUG 并重启 -->
+	<logger name="com.xiaohucare.mapper" level="warn" additivity="false">
+		<appender-ref ref="async_sql" />
+	</logger>
+	
+	<!-- Spring 框架日志（生产环境） -->
+	<logger name="org.springframework" level="warn" />
+	<logger name="org.springframework.web" level="warn" />
+	<logger name="org.springframework.boot" level="warn" />
+	
+	<!-- Hibernate/MyBatis 日志 -->
+	<logger name="org.hibernate" level="warn" />
+	<logger name="org.mybatis" level="warn" />
+	
+	<!-- 第三方库日志级别控制 -->
+	<logger name="org.apache" level="warn" />
+	<logger name="com.alibaba" level="warn" />
+	<logger name="io.lettuce" level="warn" />
+	
+	<!-- 系统用户操作日志 -->
+    <logger name="sys-user" level="info" additivity="false">
+        <appender-ref ref="async_user"/>
+    </logger>
+
+	<!-- ==================== Root 日志（生产环境） ==================== -->
+	<!-- 控制台仅输出 WARN 和 ERROR，减少日志输出 -->
+	<root level="warn">
+		<appender-ref ref="console" />
+		<appender-ref ref="async_info" />
+		<appender-ref ref="async_warn" />
+		<appender-ref ref="async_error" />
+	</root>
+</configuration> 

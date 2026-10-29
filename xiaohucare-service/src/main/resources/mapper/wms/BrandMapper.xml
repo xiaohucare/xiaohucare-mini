@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaohucare.app.care.wms.mapper.WmsBrandMapper">
+
+    <!-- 品牌销售排行 -->
+    <select id="getBrandSalesRanking" resultType="java.util.Map">
+        SELECT 
+            b.id as brandId,
+            b.brand_name as brandName,
+            COUNT(DISTINCT so.id) as orderCount,
+            SUM(si.quantity) as totalQuantity,
+            COALESCE(SUM(si.subtotal), 0) as totalAmount
+        FROM e_wms_brand b
+        LEFT JOIN e_wms_product p ON b.id = p.brand_id AND p.is_delete = 0
+        LEFT JOIN e_wms_sku s ON p.id = s.product_id AND s.is_delete = 0 AND s.status = 1
+        LEFT JOIN e_wms_sales_item si ON s.id = si.sku_id
+        LEFT JOIN e_wms_sales_order so ON si.order_id = so.id 
+            AND so.status = 1 
+            AND so.is_delete = 0
+            <if test="startDate != null and startDate != ''">
+                AND so.create_at &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND so.create_at &lt;= #{endDate}
+            </if>
+        WHERE b.is_delete = 0
+        GROUP BY b.id, b.brand_name
+        HAVING totalQuantity > 0
+        ORDER BY totalAmount DESC
+        LIMIT 10
+    </select>
+
+    <!-- 商品销售排行 -->
+    <select id="getProductSalesRanking" resultType="java.util.Map">
+        SELECT 
+            p.id as productId,
+            p.product_name as productName,
+            p.product_type as productType,
+            b.brand_name as brandName,
+            COUNT(DISTINCT so.id) as orderCount,
+            SUM(si.quantity) as totalQuantity,
+            COALESCE(SUM(si.subtotal), 0) as totalAmount
+        FROM e_wms_product p
+        LEFT JOIN e_wms_brand b ON p.brand_id = b.id AND b.is_delete = 0
+        LEFT JOIN e_wms_sku s ON p.id = s.product_id AND s.is_delete = 0 AND s.status = 1
+        LEFT JOIN e_wms_sales_item si ON s.id = si.sku_id
+        LEFT JOIN e_wms_sales_order so ON si.order_id = so.id 
+            AND so.status = 1 
+            AND so.is_delete = 0
+            <if test="startDate != null and startDate != ''">
+                AND so.create_at &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND so.create_at &lt;= #{endDate}
+            </if>
+        WHERE p.is_delete = 0
+        GROUP BY p.id, p.product_name, p.product_type, b.brand_name
+        HAVING totalQuantity > 0
+        ORDER BY totalAmount DESC
+        LIMIT 10
+    </select>
+
+</mapper>

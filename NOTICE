@@ -1,0 +1,32 @@
+xiaohucare-min（小护康养 mini 版后台服务）
+Copyright 2026 xiaohucare
+
+本项目采用 Apache License 2.0 授权，条款见 LICENSE 文件。
+
+本产品的部分基础框架代码（通用工具类、数据权限、验证码、分页、操作日志、
+接口文档集成等）参考或改写自 RuoYi-Vue-Plus 项目
+（Copyright 2018~ 现年 RuoYi 开源社区，Apache License 2.0）。
+对上游开源社区的授权使用致谢，并遵循其许可证要求保留本 NOTICE。
+
+本项目同时依赖以下第三方开源组件（完整清单以各模块 pom.xml 为准）：
+  - Spring Boot / Spring Framework / Spring Security   Apache License 2.0
+  - MyBatis-Plus                                        Apache License 2.0
+  - Druid Connection Pool                               Apache License 2.0
+  - HikariCP                                            Apache License 2.0
+  - Redisson                                            Apache License 2.0
+  - dynamic-datasource                                  Apache License 2.0
+  - Hutool                                              Apache License 2.0
+  - fastjson2                                           Apache License 2.0
+  - Apache POI                                          Apache License 2.0
+  - Apache Commons (io / compress / text / fileupload)  Apache License 2.0
+  - JJWT                                                Apache License 2.0
+  - Knife4j / springdoc-openapi                         Apache License 2.0
+  - OSHI                                                LGPL 2.1 / Apache License 2.0
+  - Lombok                                              MIT
+  - WxJava (weixin-java-mp/pay/miniapp)                 Apache License 2.0
+  - ip2region (org.lionsoul:ip2region, 含 resources/ip2region/ip2region.xdb 离线数据)  MIT
+    该数据文件由 ip2region 项目社区维护，使用前请遵循其数据使用声明
+  - 阿里云 OSS SDK / 华为云 OBS SDK                     各厂商开源许可证
+  - 大华 ICC OpenAPI SDK (com.dahuatech.icc:java-sdk-oauth)   厂商发布的 SDK，
+    已发布至 Maven 中央仓库，可直接依赖；仅 xiaohucare-framework-video-dahua
+    模块使用，不需要视频能力时可在根 pom.xml 的 <modules> 中注释掉该模块。

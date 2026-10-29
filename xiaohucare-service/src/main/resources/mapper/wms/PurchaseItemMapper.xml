@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaohucare.app.care.wms.mapper.PurchaseItemMapper">
+
+    <!-- 根据订单ID查询明细（连表查询SKU信息） -->
+    <select id="listByOrderIdWithSkuInfo" resultType="com.xiaohucare.app.care.wms.vo.PurchaseItemVO">
+        SELECT
+            pi.id,
+            pi.order_id as orderId,
+            pi.sku_id as skuId,
+            pi.quantity,
+            pi.purchase_price as purchasePrice,
+            pi.subtotal,
+            pi.production_date as productionDate,
+            pi.expiry_date as expiryDate,
+            pi.batch_no as batchNo,
+            pi.create_at as createAt,
+            pi.update_at as updateAt,
+            pi.is_delete as isDelete,
+            sku.sku_code as skuCode,
+            sku.sku_name as skuName
+        FROM e_wms_purchase_item pi
+        LEFT JOIN e_wms_sku sku ON pi.sku_id = sku.id
+        WHERE pi.order_id = #{orderId}
+          AND pi.is_delete = 0
+        ORDER BY pi.id ASC
+    </select>
+
+</mapper>

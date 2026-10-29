@@ -1,0 +1,87 @@
+# 数据源配置
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    dynamic:
+      # 设置默认的数据源或者数据源组,默认值即为 master
+      primary: master
+      # 严格模式 匹配不到数据源则报错
+      strict: false
+      datasource:
+        # 主库数据源（账号密码全部由环境变量注入，禁止提交真实值）
+        master:
+          type: ${spring.datasource.type}
+          driverClassName: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:xiaohucare_demo}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=${DB_USE_SSL:false}&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:12345678}
+      hikari:
+        # 最大连接池数量
+        maxPoolSize: 20
+        # 最小空闲线程数量
+        minIdle: 10
+        # 配置获取连接等待超时的时间
+        connectionTimeout: 30000
+        # 校验超时时间
+        validationTimeout: 5000
+        # 空闲连接存活最大时间，默认10分钟
+        idleTimeout: 600000
+        # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认30分钟
+        maxLifetime: 1800000
+        # 多久检查一次连接的活性
+        keepaliveTime: 30000
+    # Druid 监控页配置（连接池仍为 Hikari，监控 Servlet 由 DruidMonitorConfig 手动注册）
+    druid:
+      stat-view-servlet:
+        # 是否启用 /druid/login.html 监控页；默认关闭，生产环境必须保持 false
+        enabled: ${DRUID_MONITOR_ENABLED:false}
+        # Druid 控制台登录账号（与系统登录无关，开启时必须通过环境变量设置强密码）
+        login-username: ${DRUID_MONITOR_USERNAME:}
+        login-password: ${DRUID_MONITOR_PASSWORD:}
+
+# Redisson配置
+redisson:
+  # redis缓存key前缀
+  keyPrefix: ${REDIS_KEY_PREFIX:xiaohucare:}
+  # Redis服务器地址
+  host: ${REDIS_HOST:127.0.0.1}
+  # Redis服务器端口
+  port: ${REDIS_PORT:6379}
+  # Redis密码（无密码留空）
+  password: ${REDIS_PASSWORD:123456}
+  # Redis数据库索引
+  database: ${REDIS_DATABASE:9}
+  # 线程池数量
+  threads: 16
+  # Netty线程池数量
+  nettyThreads: 32
+  # 单机配置
+  singleServerConfig:
+    # 客户端名称
+    clientName: ${spring.application.name:xiaohucare-mini}
+    # 最小空闲连接数
+    connectionMinimumIdleSize: 10
+    # 连接池大小
+    connectionPoolSize: 64
+    # 连接空闲超时，单位：毫秒
+    idleConnectionTimeout: 10000
+    # 命令等待超时，单位：毫秒
+    timeout: 3000
+    # 发布和订阅连接池大小
+    subscriptionConnectionPoolSize: 50
+
+xxl-job:
+  # 默认关闭分布式调度，需要时通过 XXL_JOB_ENABLED=true 开启
+  enabled: ${XXL_JOB_ENABLED:false}
+  admin:
+    addresses: ${XXL_JOB_ADMIN_ADDRESSES:http://127.0.0.1:8080/}
+    # 调度中心通信 token，开启 xxl-job 时必须由环境变量注入
+    accessToken: ${XXL_JOB_ACCESS_TOKEN:default_token}
+    timeout: 3
+  executor:
+    app-name: ${XXL_JOB_EXECUTOR_APP:xiaohucare-executor}
+    address:
+    ip:
+    port: ${XXL_JOB_EXECUTOR_PORT:8189}
+    log-path: ${XXL_JOB_LOG_PATH:./xxl-job/platform}
+    log-retention-days: 30

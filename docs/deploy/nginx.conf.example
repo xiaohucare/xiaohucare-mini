@@ -1,0 +1,51 @@
+# xiaohucare 前端（xiaohucare-mini-vue）+ 后端 API 反向代理示例
+#
+# 使用方式：复制到 /etc/nginx/conf.d/ 后按需修改，不要直接把生产配置提交进仓库。
+#   - server_name 替换为你自己的域名
+#   - root / alias 替换为前端 dist 的实际部署路径
+#   - proxy_pass 的后端地址需与后端 application.yml 中的
+#     server.port（默认 8187，环境变量 SERVER_PORT）和
+#     server.servlet.context-path（默认 /xiaohucare-api，环境变量 SERVER_CONTEXT_PATH）保持一致
+#
+# 前端 .env.production 中的 VITE_APP_BASE_API 应为 /prod-api，与下面的 location 前缀对应。
+
+server {
+    listen 80;
+    server_name your-domain.example.com;
+
+    # 站点根目录（前端构建产物上级目录）
+    root /usr/share/nginx/html;
+
+    # 部署到二级目录 /mini/ 时的配置
+    location /mini/ {
+        # 指向打包后的 dist 目录内容
+        alias /usr/share/nginx/html/xiaohucare-mini/;
+        # 支持 HTML5 History 模式
+        try_files $uri $uri/ /mini/index.html;
+        # 静态资源长缓存
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+    }
+
+    # 默认重定向到 /mini/
+    location / {
+        return 301 /mini/;
+    }
+
+    # 后端 API 反向代理
+    location /prod-api/ {
+        proxy_pass http://127.0.0.1:8187/xiaohucare-api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 生产环境建议补充：
+    #   1. listen 443 ssl + http2，HTTP 仅做 301 跳转，证书由 certbot 等工具管理，不入仓
+    #   2. client_max_body_size 与后端 spring.servlet.multipart.max-file-size 对齐，避免大文件上传被 nginx 截断
+    #   3. 对 /prod-api/ 增加 limit_req 限速；日志路径与格式（含 $request_id）按运维规范另行定义
+    #   4. 仅反代必要路径，actuator、druid 监控页等运维端点不要对外暴露
+}

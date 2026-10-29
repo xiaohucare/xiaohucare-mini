@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaohucare.app.care.wms.mapper.SalesItemMapper">
+
+    <!-- 出货数据统计（按时间维度） -->
+    <select id="selectSalesStatsByTime" resultType="java.util.Map">
+        SELECT
+            <choose>
+                <when test="groupBy == 'year'">
+                    YEAR(so.create_at) as period
+                </when>
+                <when test="groupBy == 'month'">
+                    DATE_FORMAT(so.create_at, '%Y-%m') as period
+                </when>
+                <otherwise>
+                    DATE(so.create_at) as period
+                </otherwise>
+            </choose>,
+            SUM(si.quantity) as totalQuantity,
+            SUM(si.subtotal) as totalAmount,
+            COUNT(DISTINCT so.id) as orderCount
+        FROM e_wms_sales_item si
+        INNER JOIN e_wms_sales_order so ON si.order_id = so.id
+        WHERE si.is_delete = 0
+          AND so.status = 1
+          AND so.is_delete = 0
+        <if test="startDate != null and startDate != ''">
+            AND so.create_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND so.create_at &lt;= CONCAT(#{endDate}, ' 23:59:59')
+        </if>
+        <if test="customerId != null">
+            AND so.customer_id = #{customerId}
+        </if>
+        GROUP BY
+            <choose>
+                <when test="groupBy == 'year'">
+                    YEAR(so.create_at)
+                </when>
+                <when test="groupBy == 'month'">
+                    DATE_FORMAT(so.create_at, '%Y-%m')
+                </when>
+                <otherwise>
+                    DATE(so.create_at)
+                </otherwise>
+            </choose>
+        ORDER BY period DESC
+    </select>
+
+    <!-- 出货数据统计（按产品维度） -->
+    <select id="selectSalesStatsByProduct" resultType="java.util.Map">
+        SELECT
+            si.sku_id as skuId,
+            sku.sku_name as skuName,
+            sku.sku_code as skuCode,
+            p.product_name as productName,
+            p.product_type as productType,
+            SUM(si.quantity) as totalQuantity,
+            SUM(si.subtotal) as totalAmount
+        FROM e_wms_sales_item si
+        INNER JOIN e_wms_sales_order so ON si.order_id = so.id
+        INNER JOIN e_wms_sku sku ON si.sku_id = sku.id
+        INNER JOIN e_wms_product p ON sku.product_id = p.id
+        WHERE si.is_delete = 0
+          AND so.status = 1
+          AND so.is_delete = 0
+        <if test="startDate != null and startDate != ''">
+            AND so.create_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND so.create_at &lt;= CONCAT(#{endDate}, ' 23:59:59')
+        </if>
+        <if test="customerId != null">
+            AND so.customer_id = #{customerId}
+        </if>
+        GROUP BY si.sku_id, sku.sku_name, sku.sku_code, p.product_name, p.product_type
+        ORDER BY totalAmount DESC
+    </select>
+    
+    <!-- 出货数据统计（按客户维度） -->
+    <select id="selectSalesStatsByCustomer" resultType="java.util.Map">
+        SELECT
+            so.customer_id as customerId,
+            c.customer_name as customerName,
+            c.customer_phone as customerPhone,
+            c.customer_type as customerType,
+            COUNT(DISTINCT so.id) as orderCount,
+            SUM(si.quantity) as totalQuantity,
+            SUM(si.subtotal) as totalAmount
+        FROM e_wms_sales_item si
+        INNER JOIN e_wms_sales_order so ON si.order_id = so.id
+        LEFT JOIN e_wms_customer c ON so.customer_id = c.id
+        WHERE si.is_delete = 0
+          AND so.status = 1
+          AND so.is_delete = 0
+        <if test="startDate != null and startDate != ''">
+            AND so.create_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND so.create_at &lt;= CONCAT(#{endDate}, ' 23:59:59')
+        </if>
+        <if test="customerId != null">
+            AND so.customer_id = #{customerId}
+        </if>
+        GROUP BY so.customer_id, c.customer_name, c.customer_phone, c.customer_type
+        ORDER BY totalAmount DESC
+    </select>
+
+    <!-- 出货数据汇总 -->
+    <select id="selectSalesSummary" resultType="java.util.Map">
+        SELECT
+            SUM(si.quantity) as totalQuantity,
+            SUM(si.subtotal) as totalAmount,
+            COUNT(DISTINCT so.id) as orderCount,
+            COUNT(DISTINCT si.sku_id) as productCount
+        FROM e_wms_sales_item si
+        INNER JOIN e_wms_sales_order so ON si.order_id = so.id
+        WHERE si.is_delete = 0
+          AND so.status = 1
+          AND so.is_delete = 0
+        <if test="startDate != null and startDate != ''">
+            AND so.create_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND so.create_at &lt;= CONCAT(#{endDate}, ' 23:59:59')
+        </if>
+        <if test="customerId != null">
+            AND so.customer_id = #{customerId}
+        </if>
+    </select>
+    
+    <!-- 时间维度交叉统计（二维）- 支持客户/品牌/产品 -->
+    <select id="selectTimeCrossStats" resultType="java.util.Map">
+        SELECT
+            <choose>
+                <!-- 按客户交叉 -->
+                <when test="crossDimension == 'customer'">
+                    so.customer_id as rowId,
+                    c.customer_name as rowName,
+                    c.customer_phone as rowPhone,
+                </when>
+                <!-- 按品牌交叉 -->
+                <when test="crossDimension == 'brand'">
+                    p.brand_id as rowId,
+                    b.brand_name as rowName,
+                    '' as rowPhone,
+                </when>
+                <!-- 按产品交叉 -->
+                <when test="crossDimension == 'product'">
+                    p.id as rowId,
+                    p.product_name as rowName,
+                    '' as rowPhone,
+                </when>
+            </choose>
+            <choose>
+                <when test="timeGranularity == 'year'">
+                    YEAR(so.create_at) as period,
+                </when>
+                <when test="timeGranularity == 'day'">
+                    DATE(so.create_at) as period,
+                </when>
+                <otherwise>
+                    DATE_FORMAT(so.create_at, '%Y-%m') as period,
+                </otherwise>
+            </choose>
+            SUM(si.subtotal) as amount,
+            SUM(si.quantity) as quantity,
+            COUNT(DISTINCT so.id) as orderCount
+        FROM e_wms_sales_item si
+        INNER JOIN e_wms_sales_order so ON si.order_id = so.id
+        LEFT JOIN e_wms_sku sku ON si.sku_id = sku.id
+        LEFT JOIN e_wms_product p ON sku.product_id = p.id
+        <if test="crossDimension == 'customer'">
+            LEFT JOIN e_wms_customer c ON so.customer_id = c.id
+        </if>
+        <if test="crossDimension == 'brand'">
+            LEFT JOIN e_wms_brand b ON p.brand_id = b.id
+        </if>
+        WHERE si.is_delete = 0
+          AND so.status = 1
+          AND so.is_delete = 0
+        <if test="startDate != null and startDate != ''">
+            AND so.create_at &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND so.create_at &lt;= CONCAT(#{endDate}, ' 23:59:59')
+        </if>
+        <if test="customerId != null">
+            AND so.customer_id = #{customerId}
+        </if>
+        GROUP BY 
+            <choose>
+                <when test="crossDimension == 'customer'">
+                    so.customer_id, c.customer_name, c.customer_phone
+                </when>
+                <when test="crossDimension == 'brand'">
+                    p.brand_id, b.brand_name
+                </when>
+                <when test="crossDimension == 'product'">
+                    p.id, p.product_name
+                </when>
+            </choose>
+            , period
+        ORDER BY rowId, period
+    </select>
+
+    <!-- 根据订单ID查询明细（连表查询SKU信息） -->
+    <select id="listByOrderIdWithSkuInfo" resultType="com.xiaohucare.app.care.wms.vo.SalesItemVO">
+        SELECT
+            si.id,
+            si.order_id as orderId,
+            si.sku_id as skuId,
+            si.quantity,
+            si.sale_price as salePrice,
+            si.subtotal,
+            si.batch_id as batchId,
+            si.create_at as createAt,
+            si.update_at as updateAt,
+            si.is_delete as isDelete,
+            sku.sku_code as skuCode,
+            sku.sku_name as skuName
+        FROM e_wms_sales_item si
+        LEFT JOIN e_wms_sku sku ON si.sku_id = sku.id
+        WHERE si.order_id = #{orderId}
+          AND si.is_delete = 0
+        ORDER BY si.id ASC
+    </select>
+
+</mapper>

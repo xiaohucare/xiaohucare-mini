@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaohucare.app.care.wms.mapper.ProductMapper">
+
+    <resultMap id="ProductVOResultMap" type="com.xiaohucare.app.care.wms.vo.ProductVO">
+        <id property="id" column="id"/>
+        <result property="productName" column="product_name"/>
+        <result property="brandId" column="brand_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="barcode" column="barcode"/>
+        <result property="unit" column="unit"/>
+        <result property="productType" column="product_type"/>
+        <result property="marketPrice" column="market_price"/>
+        <result property="description" column="description"/>
+        <result property="images" column="images"/>
+        <result property="logo" column="logo"/>
+        <result property="status" column="status"/>
+        <result property="createAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <!-- 连表查询字段 -->
+        <result property="brandName" column="brand_name"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="skuCount" column="sku_count"/>
+    </resultMap>
+
+    <!-- 分页查询商品（含品牌名称、分类名称、SKU数量） -->
+    <select id="selectProductPage" resultMap="ProductVOResultMap">
+        SELECT
+            p.id,
+            p.product_name,
+            p.brand_id,
+            p.category_id,
+            p.barcode,
+            p.unit,
+            p.product_type,
+            p.market_price,
+            p.description,
+            p.images,
+            p.logo,
+            p.status,
+            p.create_at,
+            p.update_at,
+            p.create_by,
+            p.update_by,
+            b.brand_name,
+            c.category_name,
+            (SELECT COUNT(*) FROM e_wms_sku s WHERE s.product_id = p.id) AS sku_count
+        FROM e_wms_product p
+        LEFT JOIN e_wms_brand b ON p.brand_id = b.id
+        LEFT JOIN e_wms_category c ON p.category_id = c.id
+        <where>
+            <if test="params.productName != null and params.productName != ''">
+                AND p.product_name LIKE CONCAT('%', #{params.productName}, '%')
+            </if>
+            <if test="params.productType != null and params.productType != ''">
+                AND p.product_type = #{params.productType}
+            </if>
+             <if test="params.categoryId != null and params.categoryId != ''">
+                AND p.category_id = #{params.categoryId}
+            </if>
+        </where>
+        ORDER BY p.id DESC
+    </select>
+
+</mapper>
