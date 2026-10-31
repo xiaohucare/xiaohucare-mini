@@ -139,7 +139,6 @@ public class LedgerVisitAutoServiceImpl implements LedgerVisitAutoService {
 				continue;
 			}
 			LedgerVisitOrderEntity order = new LedgerVisitOrderEntity();
-			order.setStoreName(elder.getStoreName());
 			order.setElderId(elder.getId());
 			order.setElderName(elder.getName());
 			order.setOrderNo(nextOrderNo(now));

@@ -139,7 +139,6 @@ public class LedgerPatrolAutoServiceImpl implements LedgerPatrolAutoService {
 				continue;
 			}
 			LedgerPatrolOrderEntity order = new LedgerPatrolOrderEntity();
-			order.setStoreName(elder.getStoreName());
 			order.setElderId(elder.getId());
 			order.setElderName(elder.getName());
 			order.setOrderNo(nextOrderNo(now));

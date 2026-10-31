@@ -32,12 +32,6 @@ public class StoreMessageEntity extends BaseEntity {
 	@Excel(name = "主键")
 	private Long id;
 	/**
-	 * 店铺名称
-	 */
-	@Schema(description = "店铺名称")
-	@Excel(name = "店铺名称")
-	private String storeName;
-	/**
 	 * 标题
 	 */
 	@Schema(description = "标题")

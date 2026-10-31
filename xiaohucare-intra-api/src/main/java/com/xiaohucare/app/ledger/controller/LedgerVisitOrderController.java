@@ -106,7 +106,6 @@ public class LedgerVisitOrderController extends BaseController {
 				LedgerElderEntity elder = elderService.getById(order.getElderId());
 				if (elder != null) {
 					order.setElderName(elder.getName());
-					order.setStoreName(elder.getStoreName());
 				}
 			}
 			order.setOrderStatus(order.getEmployeeId() != null ? LedgerConstants.VISIT_STATUS_WAIT_VISIT

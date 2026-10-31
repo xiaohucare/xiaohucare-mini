@@ -28,9 +28,6 @@ public class LedgerElderEntity extends BaseEntity {
 	@Schema(description = "老人ID")
 	@Excel(name = "老人ID")
 	private Long id;
-	@Schema(description = "机构名称(冗余)")
-	@Excel(name = "机构名称")
-	private String storeName;
 	@Schema(description = "关联在住长者ID(e_resident.id),居家老人为空")
 	private Long residentId;
 	@Schema(description = "档案来源：1社区居家登记 2机构在住长者同步")

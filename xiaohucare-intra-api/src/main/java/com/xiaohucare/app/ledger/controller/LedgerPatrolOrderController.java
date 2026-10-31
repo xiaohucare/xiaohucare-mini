@@ -122,7 +122,6 @@ public class LedgerPatrolOrderController extends BaseController {
 				LedgerElderEntity elder = elderService.getById(order.getElderId());
 				if (elder != null) {
 					order.setElderName(elder.getName());
-					order.setStoreName(elder.getStoreName());
 					if (order.getRiskLevel() == null) {
 						order.setRiskLevel(elder.getRiskLevel());
 					}
@@ -522,7 +521,6 @@ public class LedgerPatrolOrderController extends BaseController {
 		// 不合格：生成隐患复查工单(patrol_type=4,来源指向原单)
 		if (revisit.getIsQualified() != null && revisit.getIsQualified() == 0) {
 			LedgerPatrolOrderEntity recheck = new LedgerPatrolOrderEntity();
-			recheck.setStoreName(order.getStoreName());
 			recheck.setElderId(order.getElderId());
 			recheck.setElderName(order.getElderName());
 			recheck.setOrderNo(nextOrderNo(now));

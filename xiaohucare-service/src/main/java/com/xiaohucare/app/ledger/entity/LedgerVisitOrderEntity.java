@@ -28,9 +28,6 @@ public class LedgerVisitOrderEntity extends BaseEntity {
 	@Schema(description = "工单ID")
 	@Excel(name = "工单ID")
 	private Long id;
-	@Schema(description = "机构名称(冗余)")
-	@Excel(name = "机构名称")
-	private String storeName;
 	@Schema(description = "老人ID")
 	private Long elderId;
 	@Schema(description = "老人姓名(冗余)")
