@@ -26,7 +26,5 @@ public class MainApplication {
 		ConfigurableApplicationContext application = builder.run(args);
 		
 		System.out.println("(♥◠‿◠)ﾉﾞ  小护康养 mini 版后台服务启动成功   ლ(´ڡ`ლ)ﾞ  \n");
-		Environment env = application.getEnvironment();
-		OpenBrowserUtil.openBrowser(env);
 	}
 }
